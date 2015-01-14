@@ -18,7 +18,7 @@ def submit(logger, interval, platform):
 
     while 1:
         try:
-            return submit_order(c, [c.dataset('means'), c.dataset('stats')], contexts)
+            return submit_order(c, [c.dataset('zonal_means'), c.dataset('stats')], contexts)
         except:
             time.sleep(5*60)
             logger.info('Failed submiting jobs for.  Sleeping for 5 minutes and submitting again')
