@@ -1,7 +1,6 @@
 
-
 from calendar import monthrange
-from datetime import timedelta
+from datetime import datetime, timedelta
 import os
 from flo.computation import Computation
 from flo.subprocess import check_call
@@ -60,3 +59,20 @@ class HIRS_CSRB_MONTHLY(Computation):
         check_call(cmd, shell=True, env=augmented_env({'LD_LIBRARY_PATH': lib_dir}))
 
         return {'stats': output_stats, 'zonal_means': output_zm}
+
+    def find_contexts(self, sat, hirs_version, collo_version, csrb_version, time_interval):
+
+        granules = []
+
+        start = datetime(time_interval.left.year, time_interval.left.month, 1)
+        end = datetime(time_interval.right.year, time_interval.right.month, 1)
+        date = start
+
+        while date <= end:
+            granules.append(date)
+            date = date + timedelta(days=monthrange(date.year, date.month)[1])
+
+        return [{'granule': g, 'sat': sat, 'hirs_version': hirs_version,
+                 'collo_version': collo_version,
+                 'csrb_version': csrb_version}
+                for g in granules]
