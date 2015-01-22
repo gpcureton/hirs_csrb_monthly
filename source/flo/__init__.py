@@ -76,3 +76,9 @@ class HIRS_CSRB_MONTHLY(Computation):
                  'collo_version': collo_version,
                  'csrb_version': csrb_version}
                 for g in granules]
+
+    def context_path(self, context, output):
+
+        return os.path.join('HIRS',
+                            '{}/{}'.format(context['sat'], context['granule'].year),
+                            'CSRB_MONTHLY')
