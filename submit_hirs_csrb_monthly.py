@@ -1,6 +1,7 @@
 from datetime import datetime
 from flo.time import TimeInterval
 from flo.sw.hirs_csrb_monthly import HIRS_CSRB_MONTHLY
+from flo.sw.hirs_csrb_daily import HIRS_CSRB_DAILY
 from flo.ui import submit_order
 import logging
 import sys
@@ -18,7 +19,8 @@ def submit(logger, interval, platform):
 
     while 1:
         try:
-            return submit_order(c, [c.dataset('zonal_means'), c.dataset('stats')], contexts)
+            return submit_order(c, [c.dataset('zonal_means')], contexts,
+                                (HIRS_CSRB_DAILY(),))
         except:
             time.sleep(5*60)
             logger.info('Failed submiting jobs for.  Sleeping for 5 minutes and submitting again')
