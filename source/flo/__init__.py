@@ -25,11 +25,16 @@ class HIRS_CSRB_MONTHLY(Computation):
                                                          interval)
 
         for (i, c) in enumerate(daily_contexts):
-            task.input('CSRB_DAILY-{}'.format(i), HIRS_CSRB_DAILY().dataset('means').product(c))
+            task.input('CSRB_DAILY-{}'.format(i), HIRS_CSRB_DAILY().dataset('means').product(c),
+                       True)
 
     def run_task(self, inputs, context):
 
         inputs = symlink_inputs_to_working_dir(inputs)
+
+        if len(inputs) == 0:
+            raise Exception("NO CSRB DAILY INPUTS PROVIDED")
+
         lib_dir = os.path.join(self.package_root, context['csrb_version'], 'lib')
 
         output_stats = 'csrb_monthly_stats_{}_{}.nc'.format(context['sat'],
