@@ -8,9 +8,6 @@ from calendar import monthrange
 import logging
 import traceback
 
-from subprocess import CalledProcessError, call
-from subprocess import Popen, STDOUT, PIPE
-
 from flo.time import TimeInterval
 from flo.ui import safe_submit_order
 from flo.product import StoredProductCatalog
@@ -62,8 +59,9 @@ wedge = timedelta(seconds=1.)
     #TimeInterval(datetime(2016, 12, 1),datetime(2017, 1, 1) - wedge),
 #]
 
+# Examine how many of the defined contexts are populated
 intervals = []
-year,month = 2016,5
+year,month = 2016,6
 months = range(1, 12 + 1)
 for month in months:
     days_in_month = monthrange(year, month)[1]
@@ -85,8 +83,8 @@ for interval in intervals:
     contexts = comp.find_contexts(platform, hirs_version, collo_version, csrb_version, interval)
     LOG.info("\tThere are {} contexts in this interval".format(len(contexts)))
     contexts.sort()
-    #for context in contexts:
-        #LOG.debug(context)
+    for context in contexts:
+        LOG.debug(context)
     LOG.info("\tFirst context: {}".format(contexts[0]))
     LOG.info("\tLast context:  {}".format(contexts[-1]))
     LOG.info("\t{}".format(safe_submit_order(comp,
