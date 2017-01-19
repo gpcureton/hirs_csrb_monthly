@@ -37,7 +37,8 @@ class HIRS_CSRB_MONTHLY(Computation):
         inputs = symlink_inputs_to_working_dir(inputs)
 
         if len(inputs) == 0:
-            raise Exception("NO CSRB DAILY INPUTS PROVIDED")
+            #raise Exception("NO CSRB DAILY INPUTS PROVIDED")
+            raise WorkflowNotReady('No HIRS_CSRB_DAILY inputs available for {}'.format(context['granule']))
 
         lib_dir = os.path.join(self.package_root, context['csrb_version'], 'lib')
 
