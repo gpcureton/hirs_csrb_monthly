@@ -10,7 +10,7 @@ from flo.sw.hirs_csrb_daily import HIRS_CSRB_DAILY
 
 # every module should have a LOG object
 import logging, traceback
-LOG = logging.getLogger(__file__)
+LOG = logging.getLogger(__name__)
 
 
 class HIRS_CSRB_MONTHLY(Computation):

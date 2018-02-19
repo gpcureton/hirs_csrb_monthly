@@ -16,7 +16,7 @@ from flo.sw.hirs_csrb_daily import HIRS_CSRB_DAILY
 from flo.sw.hirs_csrb_monthly import HIRS_CSRB_MONTHLY
 
 # every module should have a LOG object
-LOG = logging.getLogger(__file__)
+LOG = logging.getLogger(__name__)
 
 # Set up the logging
 console_logFormat = '%(asctime)s : (%(levelname)s):%(filename)s:%(funcName)s:%(lineno)d:  %(message)s'
