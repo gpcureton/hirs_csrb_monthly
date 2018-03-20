@@ -1,76 +1,82 @@
-import os
-from datetime import datetime, timedelta
-import logging
-import traceback
+#!/usr/bin/env python
+# encoding: utf-8
+"""
 
-from flo.time import TimeInterval
+Purpose: Run the hirs_csrb_monthly package
+
+Copyright (c) 2015 University of Wisconsin Regents.
+Licensed under GNU GPLv3.
+"""
+
+import sys
+import traceback
+import logging
+
+from timeutil import TimeInterval, datetime, timedelta
 from flo.ui import local_prepare, local_execute
 
-from flo.sw.hirs_csrb_daily import HIRS_CSRB_DAILY
-from flo.sw.hirs_csrb_monthly import HIRS_CSRB_MONTHLY
+import flo.sw.hirs_csrb_daily as hirs_csrb_daily
+import flo.sw.hirs_csrb_monthly as hirs_csrb_monthly
+from flo.sw.hirs.utils import setup_logging
 
 # every module should have a LOG object
 LOG = logging.getLogger(__name__)
 
-# Set up the logging
-levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
-level = levels[3]
-if level == logging.DEBUG:
-    console_logFormat = '%(asctime)s.%(msecs)03d (%(levelname)s) : %(filename)s : %(funcName)s : %(lineno)d:%(message)s'
-    dateFormat = '%Y-%m-%d %H:%M:%S'
-else:
-    console_logFormat = '%(asctime)s.%(msecs)03d (%(levelname)s) : %(message)s'
-    dateFormat = '%Y-%m-%d %H:%M:%S'
-
-logging.basicConfig(level=levels[2],
-                    format=console_logFormat,
-                    datefmt=dateFormat)
-
 # General information
-comp = HIRS_CSRB_MONTHLY()
+hirs_version  = 'v20151014'
+collo_version = 'v20151014'
+csrb_version  = 'v20150915'
+wedge = timedelta(seconds=1.)
+
+# Satellite specific information
+#satellite = 'noaa-19'
+satellite = 'metop-b'
+
+# Instantiate the computations
+hirs_csrb_daily_comp = hirs_csrb_daily.HIRS_CSRB_DAILY()
+comp = hirs_csrb_monthly.HIRS_CSRB_MONTHLY()
 
 #
 # Local execution
 #
 
-def local_execute_example(granule, platform, hirs_version, collo_version, csrb_version,
-                          skip_prepare=False, skip_execute=False):
-    comp_dict = { 
-        'granule': granule
-        'sat': platform, 
-        'hirs_version': hirs_version, 
-        'collo_version': collo_version, 
-        'csrb_version': csrb_version}
+def local_execute_example(interval, satellite, hirs_version, collo_version, csrb_version,
+                          skip_prepare=False, skip_execute=False, verbosity=2):
+    setup_logging(verbosity)
 
-    try:
-        if not skip_prepare:
-            LOG.info("Running local prepare...")
-            local_prepare(comp, comp_dict, download_only=[HIRS_CSRB_DAILY()])
-        if not skip_execute:
-            LOG.info("Running local execute...")
-            local_execute(comp, comp_dict)
-    except Exception, err:
-        LOG.error("{}".format(err))
-        LOG.info(traceback.format_exc())
+    # Get the required context...
+    LOG.info("Getting required contexts for local execution...")
+    contexts =  comp.find_contexts(interval, satellite, hirs_version, collo_version, csrb_version)
+    LOG.info("Finished getting required contexts for local execution\n")
 
-def print_contexts(platform, dt_left, dt_right, granule_length):
-    interval = TimeInterval(dt_left, dt_right)
-    contexts = comp.find_contexts(platform, hirs_version, collo_version, csrb_version, interval)
-    contexts.sort()
+    if len(contexts) != 0:
+        LOG.info("Candidate contexts in interval...")
+        for context in contexts:
+            print("\t{}".format(context))
+
+        try:
+            if not skip_prepare:
+                LOG.info("Running hirs_csrb_monthly local_prepare()...")
+                LOG.info("Preparing context... {}".format(contexts[0]))
+                local_prepare(comp, contexts[0],download_only=[hirs_csrb_daily_comp])
+            if not skip_execute:
+                LOG.info("Running hirs_csrb_monthly local_execute()...")
+                LOG.info("Running context... {}".format(contexts[0]))
+                local_execute(comp, contexts[0])
+        except Exception, err:
+            LOG.error("{}".format(err))
+            LOG.debug(traceback.format_exc())
+    else:
+        LOG.error("There are no valid {} contexts for the interval {}.".format(satellite, interval))
+
+def print_contexts(interval, satellite, hirs_version, collo_version, csrb_version, verbosity=2):
+    setup_logging(verbosity)
+    contexts = comp.find_contexts(interval, satellite, hirs_version, collo_version, csrb_version)
     for context in contexts:
-        print context
+        LOG.info(context)
 
-    return contexts
+#satellite_choices = ['noaa-06', 'noaa-07', 'noaa-08', 'noaa-09', 'noaa-10', 'noaa-11',
+                    #'noaa-12', 'noaa-14', 'noaa-15', 'noaa-16', 'noaa-17', 'noaa-18',
+                    #'noaa-19', 'metop-a', 'metop-b']
 
-platform_choices = ['noaa-06', 'noaa-07', 'noaa-08', 'noaa-09', 'noaa-10', 'noaa-11',
-                    'noaa-12', 'noaa-14', 'noaa-15', 'noaa-16', 'noaa-17', 'noaa-18',
-                    'noaa-19', 'metop-a', 'metop-b']
-
-platform = 'metop-b'
-hirs_version  = 'v20151014'
-collo_version = 'v20151014'
-csrb_version  = 'v20150915'
-granule = datetime(2016, 6, 3, 21, 17)
-granule = datetime(2016, 6, 3, 20, 32)
-
-#local_execute_example(granule, platform, hirs_version, collo_version, csrb_version):
+#local_execute_example(granule, satellite, hirs_version, collo_version, csrb_version):
