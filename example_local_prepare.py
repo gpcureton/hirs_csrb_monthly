@@ -17,37 +17,43 @@ from flo.ui import local_prepare, local_execute
 
 import flo.sw.hirs_csrb_daily as hirs_csrb_daily
 import flo.sw.hirs_csrb_monthly as hirs_csrb_monthly
-from flo.sw.hirs.utils import setup_logging
+
+from flo.sw.hirs2nc.utils import setup_logging
 
 # every module should have a LOG object
 LOG = logging.getLogger(__name__)
 
+#
 # General information
-hirs_version  = 'v20151014'
-collo_version = 'v20151014'
-csrb_version  = 'v20150915'
+#
+
+#hirs2nc_delivery_id = '20180410-1'
+#hirs_avhrr_delivery_id = '20180505-1'
+#hirs_csrb_daily_delivery_id  = '20180511-1'
+#hirs_csrb_monthly_delivery_id  = '20180516-1'
 wedge = timedelta(seconds=1.)
 
 # Satellite specific information
-#satellite = 'noaa-19'
-satellite = 'metop-b'
 
-# Instantiate the computations
-hirs_csrb_daily_comp = hirs_csrb_daily.HIRS_CSRB_DAILY()
-comp = hirs_csrb_monthly.HIRS_CSRB_MONTHLY()
+#granule = datetime(2017, 1, 1, 0, 32)
+#interval = TimeInterval(granule, granule+timedelta(seconds=0))
 
 #
 # Local execution
 #
 
-def local_execute_example(interval, satellite, hirs_version, collo_version, csrb_version,
-                          skip_prepare=False, skip_execute=False, verbosity=2):
+def local_execute_example(interval, satellite, hirs2nc_delivery_id, hirs_avhrr_delivery_id, hirs_csrb_daily_delivery_id,
+                          hirs_csrb_monthly_delivery_id, skip_prepare=False, skip_execute=False, verbosity=2):
+
     setup_logging(verbosity)
 
+    #comp = setup_computation(satellite)
+    comp = hirs_csrb_monthly.HIRS_CSRB_MONTHLY()
+    hirs_csrb_daily_comp = hirs_csrb_daily.HIRS_CSRB_DAILY()
+
     # Get the required context...
-    LOG.info("Getting required contexts for local execution...")
-    contexts =  comp.find_contexts(interval, satellite, hirs_version, collo_version, csrb_version)
-    LOG.info("Finished getting required contexts for local execution\n")
+    contexts =  comp.find_contexts(interval, satellite, hirs2nc_delivery_id, hirs_avhrr_delivery_id,
+                                   hirs_csrb_daily_delivery_id, hirs_csrb_monthly_delivery_id)
 
     if len(contexts) != 0:
         LOG.info("Candidate contexts in interval...")
@@ -69,14 +75,19 @@ def local_execute_example(interval, satellite, hirs_version, collo_version, csrb
     else:
         LOG.error("There are no valid {} contexts for the interval {}.".format(satellite, interval))
 
-def print_contexts(interval, satellite, hirs_version, collo_version, csrb_version, verbosity=2):
+def print_contexts(interval, satellite, hirs2nc_delivery_id, hirs_avhrr_delivery_id,
+                   hirs_csrb_daily_delivery_id, hirs_csrb_monthly_delivery_id, verbosity=2):
+
     setup_logging(verbosity)
-    contexts = comp.find_contexts(interval, satellite, hirs_version, collo_version, csrb_version)
+    
+    #comp = setup_computation(satellite)
+    comp = hirs_csrb_monthly.HIRS_CSRB_MONTHLY()
+
+    contexts = comp.find_contexts(interval, satellite, hirs2nc_delivery_id, hirs_avhrr_delivery_id,
+                                  hirs_csrb_daily_delivery_id, hirs_csrb_monthly_delivery_id)
     for context in contexts:
         LOG.info(context)
 
 #satellite_choices = ['noaa-06', 'noaa-07', 'noaa-08', 'noaa-09', 'noaa-10', 'noaa-11',
                     #'noaa-12', 'noaa-14', 'noaa-15', 'noaa-16', 'noaa-17', 'noaa-18',
                     #'noaa-19', 'metop-a', 'metop-b']
-
-#local_execute_example(granule, satellite, hirs_version, collo_version, csrb_version):
