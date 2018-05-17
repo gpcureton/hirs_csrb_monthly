@@ -131,7 +131,14 @@ class HIRS_CSRB_MONTHLY(Computation):
         # Create the output directory
         current_dir = os.getcwd()
 
-        # Get the required CFSR and wgrib2 script locations
+        # Check that we actually have some inputs...
+        num_inputs = len(inputs.keys())
+        if num_inputs == 0:
+            LOG.warn('No HIRS_CSRB_DAILY inputs for {}, aborting...'.format(context['granule']))
+            rc = 1
+            return rc, None
+
+        # Get the required binary locations
         hirs_csrb_monthly_delivery_id = context['hirs_csrb_monthly_delivery_id']
         delivery = delivered_software.lookup('hirs_csrb_monthly', delivery_id=hirs_csrb_monthly_delivery_id)
         dist_root = pjoin(delivery.path, 'dist')
@@ -243,7 +250,7 @@ class HIRS_CSRB_MONTHLY(Computation):
         # Create the CFSR statistics for the current month.
         rc, output_stats_file = self.create_monthly_statistics(inputs, context)
         if rc != 0:
-            return rc
+            return {}
         LOG.info('create_monthly_statistics() generated {}...'.format(output_stats_file))
 
         # Create the CFSR zonal means for the current month
