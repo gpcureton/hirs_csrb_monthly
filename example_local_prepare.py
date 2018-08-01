@@ -29,7 +29,7 @@ LOG = logging.getLogger(__name__)
 
 #hirs2nc_delivery_id = '20180410-1'
 #hirs_avhrr_delivery_id = '20180505-1'
-#hirs_csrb_daily_delivery_id  = '20180511-1'
+#hirs_csrb_daily_delivery_id  = '20180714-1'
 #hirs_csrb_monthly_delivery_id  = '20180516-1'
 wedge = timedelta(seconds=1.)
 
@@ -47,7 +47,6 @@ def local_execute_example(interval, satellite, hirs2nc_delivery_id, hirs_avhrr_d
 
     setup_logging(verbosity)
 
-    #comp = setup_computation(satellite)
     comp = hirs_csrb_monthly.HIRS_CSRB_MONTHLY()
     hirs_csrb_daily_comp = hirs_csrb_daily.HIRS_CSRB_DAILY()
 
@@ -79,8 +78,7 @@ def print_contexts(interval, satellite, hirs2nc_delivery_id, hirs_avhrr_delivery
                    hirs_csrb_daily_delivery_id, hirs_csrb_monthly_delivery_id, verbosity=2):
 
     setup_logging(verbosity)
-    
-    #comp = setup_computation(satellite)
+
     comp = hirs_csrb_monthly.HIRS_CSRB_MONTHLY()
 
     contexts = comp.find_contexts(interval, satellite, hirs2nc_delivery_id, hirs_avhrr_delivery_id,
