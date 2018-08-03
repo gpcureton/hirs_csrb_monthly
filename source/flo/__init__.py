@@ -16,6 +16,7 @@ import shutil
 from calendar import monthrange
 import logging
 import traceback
+from subprocess import CalledProcessError
 
 from flo.computation import Computation
 from flo.builder import WorkflowNotReady
