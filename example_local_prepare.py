@@ -63,11 +63,11 @@ def local_execute_example(interval, satellite, hirs2nc_delivery_id, hirs_avhrr_d
             if not skip_prepare:
                 LOG.info("Running hirs_csrb_monthly local_prepare()...")
                 LOG.info("Preparing context... {}".format(contexts[0]))
-                local_prepare(comp, contexts[0],download_only=[hirs_csrb_daily_comp])
+                local_prepare(comp, contexts[0], download_onlies=[hirs_csrb_daily_comp])
             if not skip_execute:
                 LOG.info("Running hirs_csrb_monthly local_execute()...")
                 LOG.info("Running context... {}".format(contexts[0]))
-                local_execute(comp, contexts[0])
+                local_execute(comp, contexts[0], download_onlies=[hirs_csrb_daily_comp])
         except Exception, err:
             LOG.error("{}".format(err))
             LOG.debug(traceback.format_exc())
